@@ -84,13 +84,19 @@ export default defineConfig({
     target: 'es2020',
     cssCodeSplit: true,
     sourcemap: false,
-    minify: 'esbuild',
+    // Vite 8 / rolldown default minifier (oxc) is fastest; let it pick.
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'motion-vendor': ['framer-motion'],
-          icons: ['lucide-react'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('framer-motion') || id.includes('motion-dom') || id.includes('motion-utils')) {
+            return 'motion-vendor'
+          }
+          if (id.includes('react-router') || id.includes('react-dom') || id.includes('/react/')) {
+            return 'react-vendor'
+          }
+          if (id.includes('lucide-react')) return 'icons'
+          if (id.includes('react-helmet-async')) return 'seo-vendor'
         },
       },
     },
