@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react'
+import { ArrowDown, Github, Linkedin } from 'lucide-react'
 import CodeSymbols3D from './CodeSymbols3D'
 import TypingTerminal from './TypingTerminal'
+import { buildWhatsAppUrl, WhatsAppIcon } from '../lib/whatsapp'
 
 function ParticleCanvas() {
   const canvasRef = useRef(null)
@@ -283,13 +284,15 @@ export default function Hero() {
           </motion.a>
 
           <motion.a
-            href="#contact"
+            href={buildWhatsAppUrl('Hi Shaheed! I came from your portfolio and would love to chat.')}
+            target="_blank"
+            rel="noopener noreferrer"
             className="glass hover:bg-white/10 transition-all duration-300"
-            style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'Space Grotesk', sans-serif", padding: '16px 36px', borderRadius: 999, fontSize: 14, letterSpacing: '0.08em', minHeight: 52, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-            whileHover={{ scale: 1.04 }}
+            style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'Space Grotesk', sans-serif", padding: '16px 36px', borderRadius: 999, fontSize: 14, letterSpacing: '0.08em', minHeight: 52, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+            whileHover={{ scale: 1.04, color: '#fff' }}
             whileTap={{ scale: 0.96 }}
           >
-            Get In Touch
+            <WhatsAppIcon size={16} /> Get In Touch
           </motion.a>
         </motion.div>
 
@@ -301,18 +304,19 @@ export default function Hero() {
           transition={{ delay: 2.6, duration: 0.8 }}
         >
           {[
-            { icon: Github, href: 'https://github.com/shaheedmohamed' },
-            { icon: Linkedin, href: '#' },
-            { icon: Mail, href: 'mailto:contact@shaheed.dev' },
-          ].map(({ icon: Icon, href }, i) => (
+            { icon: Github, href: 'https://github.com/shaheedmohamed', hoverColor: '#a78bfa' },
+            { icon: Linkedin, href: 'https://www.linkedin.com/in/shaheedmohamed', hoverColor: '#a78bfa' },
+            { icon: WhatsAppIcon, href: buildWhatsAppUrl('Hi Shaheed! I came from your portfolio.'), hoverColor: '#22c55e' },
+          ].map(({ icon: Icon, href, hoverColor }, i) => (
             <motion.a
               key={i}
               href={href}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="contact link"
               className="rounded-full glass transition-all duration-300"
               style={{ color: 'rgba(255,255,255,0.4)', padding: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              whileHover={{ scale: 1.2, y: -3, color: '#a78bfa' }}
+              whileHover={{ scale: 1.2, y: -3, color: hoverColor }}
             >
               <Icon size={18} />
             </motion.a>

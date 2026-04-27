@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Send, MapPin, Mail, Phone, ArrowUpRight } from 'lucide-react'
+import { MapPin, Clock, ArrowUpRight } from 'lucide-react'
+import { WHATSAPP_DISPLAY, buildWhatsAppUrl, WhatsAppIcon } from '../lib/whatsapp'
 
 const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
 const inputStyle = {
@@ -18,14 +19,28 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    setIsSubmitting(false)
-    setSubmitted(true)
-    setFormState({ name: '', email: '', message: '' })
-    setTimeout(() => setSubmitted(false), 4000)
+
+    const lines = [
+      `Hi Shaheed!`,
+      ``,
+      `Name: ${formState.name}`,
+      `Email: ${formState.email}`,
+      ``,
+      `Message:`,
+      formState.message,
+    ]
+    const url = buildWhatsAppUrl(lines.join('\n'))
+    window.open(url, '_blank', 'noopener,noreferrer')
+
+    setTimeout(() => {
+      setIsSubmitting(false)
+      setSubmitted(true)
+      setFormState({ name: '', email: '', message: '' })
+      setTimeout(() => setSubmitted(false), 4000)
+    }, 600)
   }
 
   return (
@@ -37,7 +52,7 @@ export default function Contact() {
         <motion.span className="text-xs tracking-[0.3em] uppercase"
           style={{ ...displayFont, color: 'rgba(167,139,250,0.5)', display: 'block', marginBottom: 16 }}
           initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-          06 — Contact
+          10 — Contact
         </motion.span>
         <motion.h2 className="font-bold text-white"
           style={{ ...displayFont, marginBottom: 24, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
@@ -54,24 +69,71 @@ export default function Contact() {
           <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
             initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             {[
-              { icon: Mail, label: 'Email', value: 'shaheedmhmed@gmail.com', href: 'mailto:shaheedmhmed@gmail.com' },
-              { icon: MapPin, label: 'Location', value: 'Available Worldwide', href: null },
-              { icon: Phone, label: 'Status', value: 'Open for freelance', href: null },
-            ].map(({ icon: Icon, label, value, href }, i) => (
-              <motion.div key={i} className="group rounded-2xl glass hover:bg-white/[0.06] transition-all" style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: 20 }} whileHover={{ x: 8 }}>
-                <div className="p-3 rounded-xl" style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa' }}>
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <div className="text-xs tracking-wider mb-1" style={{ ...displayFont, color: 'rgba(255,255,255,0.3)' }}>{label}</div>
-                  {href ? (
-                    <a href={href} className="text-white hover:text-purple-400 transition-colors font-medium">{value}</a>
-                  ) : (
-                    <span className="text-white font-medium">{value}</span>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+              {
+                icon: WhatsAppIcon,
+                label: 'WhatsApp',
+                value: WHATSAPP_DISPLAY,
+                href: buildWhatsAppUrl(),
+                accent: '#22c55e',
+                external: true,
+              },
+              {
+                icon: MapPin,
+                label: 'Location',
+                value: 'Available Worldwide',
+                href: null,
+                accent: '#a78bfa',
+              },
+              {
+                icon: Clock,
+                label: 'Response Time',
+                value: 'Usually within 1 hour',
+                href: buildWhatsAppUrl('Hi Shaheed! I have a quick question.'),
+                accent: '#06b6d4',
+                external: true,
+              },
+            ].map(({ icon: Icon, label, value, href, accent, external }, i) => {
+              const card = (
+                <motion.div
+                  className="group rounded-2xl glass hover:bg-white/[0.06] transition-all"
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: 20 }}
+                  whileHover={{ x: 8 }}
+                >
+                  <div
+                    className="p-3 rounded-xl"
+                    style={{ background: `${accent}1f`, color: accent }}
+                  >
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <div
+                      className="text-xs tracking-wider mb-1"
+                      style={{ ...displayFont, color: 'rgba(255,255,255,0.3)' }}
+                    >
+                      {label}
+                    </div>
+                    <span
+                      className="text-white font-medium"
+                      style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                    >
+                      {value}
+                    </span>
+                  </div>
+                </motion.div>
+              )
+              return href ? (
+                <a
+                  key={i}
+                  href={href}
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  style={{ textDecoration: 'none', display: 'block' }}
+                >
+                  {card}
+                </a>
+              ) : (
+                <div key={i}>{card}</div>
+              )
+            })}
             <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
                 { label: 'GitHub', href: 'https://github.com/shaheedmohamed', sub: '@shaheedmohamed' },
@@ -152,7 +214,7 @@ export default function Contact() {
               className="group relative overflow-hidden"
               style={{
                 ...displayFont,
-                background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
                 padding: '16px 32px',
                 borderRadius: 12,
                 fontSize: 14,
@@ -165,14 +227,20 @@ export default function Contact() {
                 minHeight: 52,
                 width: '100%',
               }}
-              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(139,92,246,0.4)' }}
+              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(34,197,94,0.4)' }}
               whileTap={{ scale: 0.98 }}
             >
-              <span style={{ position: 'relative', zIndex: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                {isSubmitting ? 'Sending...' : submitted ? '✓ Message Sent!' : (<>Send Message <Send size={14} /></>)}
+              <span style={{ position: 'relative', zIndex: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                {isSubmitting ? 'Opening WhatsApp...' : submitted ? '✓ Sent to WhatsApp!' : (<>Send via WhatsApp <WhatsAppIcon size={16} /></>)}
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </motion.button>
+            <p
+              className="text-xs text-center"
+              style={{ ...displayFont, color: 'rgba(255,255,255,0.35)', marginTop: -4 }}
+            >
+              Your message opens directly in WhatsApp — no email needed.
+            </p>
           </motion.form>
         </div>
       </div>

@@ -59,7 +59,7 @@ export default function Skills() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          03 — Skills
+          04 — Skills
         </motion.span>
         <motion.h2
           className="font-bold text-white"

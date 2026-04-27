@@ -8,10 +8,14 @@ const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
 const navItems = [
   { id: 'hero', label: '01', name: 'Home' },
   { id: 'about', label: '02', name: 'About' },
-  { id: 'skills', label: '03', name: 'Skills' },
-  { id: 'projects', label: '04', name: 'Projects' },
-  { id: 'reviews', label: '05', name: 'Reviews' },
-  { id: 'contact', label: '06', name: 'Contact' },
+  { id: 'services', label: '03', name: 'Services' },
+  { id: 'skills', label: '04', name: 'Skills' },
+  { id: 'experience', label: '05', name: 'Journey' },
+  { id: 'projects', label: '06', name: 'Projects' },
+  { id: 'achievements', label: '07', name: 'Awards' },
+  { id: 'blog', label: '08', name: 'Blog' },
+  { id: 'reviews', label: '09', name: 'Reviews' },
+  { id: 'contact', label: '10', name: 'Contact' },
 ]
 
 export default function Navigation() {
@@ -65,12 +69,13 @@ export default function Navigation() {
                   className="transition-all duration-300"
                   style={{
                     ...displayFont,
-                    padding: '8px 16px',
+                    padding: '8px 12px',
                     borderRadius: 999,
-                    fontSize: 12,
-                    letterSpacing: '0.08em',
+                    fontSize: 11,
+                    letterSpacing: '0.06em',
                     cursor: 'pointer',
                     border: 'none',
+                    whiteSpace: 'nowrap',
                     ...(activeSection === item.id
                       ? { background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }
                       : { background: 'transparent', color: 'rgba(255,255,255,0.5)' }),

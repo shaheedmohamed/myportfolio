@@ -91,7 +91,7 @@ export default function Reviews() {
         <motion.span className="text-xs tracking-[0.3em] uppercase"
           style={{ ...displayFont, color: 'rgba(167,139,250,0.5)', marginBottom: 16, display: 'block' }}
           initial={{ opacity: 0, y: -10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          05 — Reviews
+          09 — Reviews
         </motion.span>
         <motion.h2 className="font-bold text-white"
           style={{ ...displayFont, marginBottom: 64, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
