@@ -58,8 +58,8 @@ export default function NowPlaying() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-        className="fixed left-4 bottom-4 z-40"
-        style={{ maxWidth: 'calc(100vw - 32px)' }}
+        className="now-playing-widget fixed left-3 bottom-3 sm:left-4 sm:bottom-4 z-40"
+        style={{ maxWidth: 'calc(100vw - 24px)' }}
       >
         {open ? (
           <motion.div

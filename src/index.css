@@ -127,17 +127,194 @@ input::placeholder, textarea::placeholder {
   }
 }
 
-/* Mobile spacing overrides - sections feel less cramped */
+/* ============================================================
+   HERO RESPONSIVE
+   ============================================================ */
+.hero-content {
+  text-align: center;
+  padding: 0 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+.hero-pretitle { margin-bottom: 32px; }
+.hero-cta { margin-top: 40px; }
+.hero-social { margin-top: 48px; }
+
 @media (max-width: 768px) {
+  .hero-content { padding: 0 18px; }
+  .hero-pretitle { margin-bottom: 18px; }
+  .hero-cta { margin-top: 24px; gap: 10px !important; }
+  .hero-cta a { padding: 12px 22px !important; font-size: 13px !important; min-height: 46px !important; }
+  .hero-social { margin-top: 28px; }
+  .hero-social a { padding: 10px !important; }
+  .hero-tagline { font-size: 13.5px !important; line-height: 1.55 !important; max-width: 90% !important; }
+  /* Trim the hero so the next section is visible after a short scroll */
+  #hero { min-height: auto !important; padding-top: 96px !important; padding-bottom: 64px !important; }
+  /* Disable expensive perspective drift on mobile to save GPU */
+  .hero-title { transform: none !important; }
+}
+
+/* ============================================================
+   MOBILE-FIRST OPTIMIZATION
+   Goal: maximum useful content per screen, minimal dead space.
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Tight section rhythm — 56px vertical, 16px horizontal */
   section {
-    padding-top: 80px !important;
-    padding-bottom: 80px !important;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
+
+  /* Inner max-width wrappers shouldn't double the gutter */
   section > div[style*="max-width"] {
     padding-left: 0 !important;
     padding-right: 0 !important;
+  }
+
+  /* Section h2 — compact display size + tight gap to next content */
+  section h2 {
+    margin-bottom: 16px !important;
+    font-size: clamp(26px, 7.5vw, 38px) !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Lead paragraph after a heading — limit excess gap */
+  section h2 + p,
+  section .motion-p,
+  section [class*="text-base"][class*="md:text-lg"] {
+    margin-bottom: 24px !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+  }
+
+  /* Section number eyebrow */
+  section [class*="tracking-[0.3em]"] {
+    margin-bottom: 10px !important;
+    font-size: 10px !important;
+  }
+
+  /* Tone down decorative radial blobs (heavy on mobile GPUs) */
+  section > .absolute[class*="rounded-full"][class*="pointer-events-none"] {
+    opacity: 0.35;
+    transform: scale(0.6);
+  }
+
+  /* Form inputs — comfortable touch target without bloat */
+  input, textarea {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Buttons — slightly smaller, still tappable (≥44px) */
+  button, a[class*="rounded-full"] {
+    min-height: 44px;
+  }
+
+  /* Skills — single column, tighter cards */
+  .skills-grid {
+    grid-template-columns: 1fr !important;
+    row-gap: 10px !important;
+  }
+  .skill-card {
+    padding: 14px 16px !important;
+  }
+  .skills-tabs button {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+  .skills-tags { margin-top: 24px !important; }
+
+  /* Generic glass cards inside grids — compress padding */
+  section [class*="rounded-2xl"][class*="glass"] {
+    border-radius: 16px;
+  }
+
+  /* Compress oversized inline margins on mobile */
+  section [style*="margin-bottom: 80"], section [style*="marginBottom: 80"] { margin-bottom: 24px !important; }
+  section [style*="margin-bottom: 64"], section [style*="marginBottom: 64"] { margin-bottom: 24px !important; }
+  section [style*="margin-bottom: 56"], section [style*="marginBottom: 56"] { margin-bottom: 20px !important; }
+  section [style*="margin-top: 80"], section [style*="marginTop: 80"] { margin-top: 28px !important; }
+  section [style*="margin-top: 64"], section [style*="marginTop: 64"] { margin-top: 24px !important; }
+  section [style*="margin-top: 56"], section [style*="marginTop: 56"] { margin-top: 24px !important; }
+  section [style*="margin-top: 48"], section [style*="marginTop: 48"] { margin-top: 20px !important; }
+  section [style*="padding: 48px 40px"] { padding: 24px 20px !important; }
+  section [style*="padding: 28px"] { padding: 18px !important; }
+
+  /* Tighten outer card grids (services/projects/etc.) without touching divider grids (gap:1) */
+  section [style*="grid-template-columns"][style*="repeat(auto-fit"] {
+    gap: 12px !important;
+  }
+
+  /* Reviews quote card — less inner padding so quote is readable */
+  #reviews [class*="glass"][class*="glow"] {
+    padding: 24px 20px !important;
+  }
+  #reviews blockquote {
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+  }
+
+  /* Contact form — tighter rhythm */
+  #contact form {
+    gap: 14px !important;
+  }
+  #contact form > div[style*="grid"] {
+    gap: 10px !important;
+  }
+
+  /* Timeline — tighter dots and cards */
+  #experience [style*="paddingLeft: 40"] {
+    padding-left: 28px !important;
+  }
+
+  /* CodeIntro — hide the heavy 3D cube on small screens */
+  #code-intro [style*="perspective"] {
+    display: none !important;
+  }
+
+  /* GitHub stats — compress padding */
+  section [class*="rounded-2xl"][class*="glass"] [style*="padding: 24px 20px"],
+  section [class*="rounded-2xl"][class*="glass"] [style*="padding: 20px 28px"] {
+    padding: 14px 16px !important;
+  }
+
+  /* Project filter chips — tighter */
+  #projects button[class*="text-xs"][class*="tracking-wider"] {
+    padding: 6px 14px !important;
+  }
+
+  /* Footer — compact */
+  footer {
+    padding: 28px 16px !important;
+  }
+
+  /* Navigation — slim top bar */
+  .nav-inner { padding: 0 16px !important; }
+  .nav-header { padding: 8px 0 !important; }
+  .nav-header > div > div > button[class*="lg:hidden"] { padding: 8px !important; }
+
+  /* NowPlaying widget — smaller pill / panel */
+  .now-playing-widget [class*="rounded-full"][class*="glass-strong"] {
+    padding: 7px 11px !important;
+    font-size: 11px !important;
+  }
+  .now-playing-widget [class*="rounded-2xl"][class*="glass-strong"] {
+    width: min(280px, calc(100vw - 24px)) !important;
+  }
+}
+
+/* Extra-small phones (< 380px) — push density even further */
+@media (max-width: 380px) {
+  section {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+  section h2 {
+    font-size: clamp(22px, 7vw, 30px) !important;
   }
 }
 

@@ -53,11 +53,11 @@ export default function Navigation() {
 
       {/* Top bar */}
       <motion.header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-        style={scrolled ? { background: 'rgba(6,6,11,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '12px 0' } : { padding: '20px 0' }}
+        className="nav-header fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={scrolled ? { background: 'rgba(6,6,11,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '10px 0' } : { padding: '16px 0' }}
         initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.8, delay: 1.5 }}
       >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="nav-inner" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <motion.button onClick={() => scrollToSection('hero')} className="text-xl font-bold" style={displayFont} whileHover={{ scale: 1.05 }}>
             <span className="text-gradient">SM</span>
           </motion.button>

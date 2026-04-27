@@ -205,10 +205,11 @@ export default function Hero() {
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#06060b] to-transparent z-[2]" />
 
       {/* Content */}
-      <div className="relative z-10" style={{ textAlign: 'center', padding: '0 40px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+      <div className="relative z-10 hero-content">
         {/* Pre-title */}
         <motion.div
-          style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
+          className="hero-pretitle"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 1 }}
@@ -221,7 +222,7 @@ export default function Hero() {
         </motion.div>
 
         {/* Name */}
-        <h1 ref={nameRef} className="font-bold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif", lineHeight: 0.95, fontSize: 'clamp(48px, 11vw, 140px)', transformStyle: 'preserve-3d', transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform' }}>
+        <h1 ref={nameRef} className="font-bold tracking-tight hero-title" style={{ fontFamily: "'Space Grotesk', sans-serif", lineHeight: 0.95, fontSize: 'clamp(40px, 11vw, 140px)', transformStyle: 'preserve-3d', transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform' }}>
           <span className="block overflow-hidden">
             {firstName.split('').map((char, i) => (
               <motion.span
@@ -254,8 +255,8 @@ export default function Hero() {
 
         {/* Tagline */}
         <motion.p
-          className="text-base sm:text-lg md:text-xl"
-          style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 560, margin: '32px auto 0', lineHeight: 1.7 }}
+          className="hero-tagline text-base sm:text-lg md:text-xl"
+          style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 560, margin: '24px auto 0', lineHeight: 1.6 }}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
@@ -267,7 +268,8 @@ export default function Hero() {
 
         {/* CTA Buttons */}
         <motion.div
-          style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 16 }}
+          className="hero-cta"
+          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 12 }}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.2, duration: 0.8 }}
@@ -298,7 +300,8 @@ export default function Hero() {
 
         {/* Social links */}
         <motion.div
-          style={{ marginTop: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}
+          className="hero-social"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2.6, duration: 0.8 }}

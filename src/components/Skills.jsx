@@ -46,7 +46,7 @@ export default function Skills() {
   const [activeCategory, setActiveCategory] = useState(0)
 
   return (
-    <section id="skills" className="relative overflow-hidden"
+    <section id="skills" className="relative overflow-hidden skills-section"
       style={{ background: 'linear-gradient(180deg, #06060b 0%, #080812 50%, #06060b 100%)', padding: '120px 24px' }}>
       <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full translate-x-1/2 pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)' }} />
@@ -63,7 +63,7 @@ export default function Skills() {
         </motion.span>
         <motion.h2
           className="font-bold text-white"
-          style={{ ...displayFont, marginBottom: 56, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
+          style={{ ...displayFont, marginBottom: 32, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -73,7 +73,8 @@ export default function Skills() {
         </motion.h2>
 
         <motion.div
-          style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 40 }}
+          className="skills-tabs"
+          style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -82,9 +83,12 @@ export default function Skills() {
             <button
               key={i}
               onClick={() => setActiveCategory(i)}
-              className="px-6 py-3 rounded-full text-sm tracking-wider transition-all duration-500"
+              className="rounded-full transition-all duration-500"
               style={{
                 ...displayFont,
+                padding: '10px 18px',
+                fontSize: 13,
+                letterSpacing: '0.05em',
                 ...(activeCategory === i
                   ? {
                       background: `linear-gradient(135deg, ${cat.color}35, ${cat.color}15)`,
@@ -105,7 +109,8 @@ export default function Skills() {
         </motion.div>
 
         <motion.div
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', columnGap: 24, rowGap: 24 }}
+          className="skills-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', columnGap: 16, rowGap: 12 }}
           key={activeCategory}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -114,20 +119,20 @@ export default function Skills() {
           {skillCategories[activeCategory].skills.map((skill, i) => (
             <motion.div
               key={skill.name}
-              className="relative rounded-2xl glass overflow-hidden hover:bg-white/[0.06] transition-all duration-500"
-              style={{ padding: 24 }}
+              className="skill-card relative rounded-2xl glass overflow-hidden hover:bg-white/[0.06] transition-all duration-500"
+              style={{ padding: 20 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
+              transition={{ delay: i * 0.06 }}
               whileHover={{ y: -4 }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h3 className="font-medium text-white" style={{ ...displayFont, fontSize: 15 }}>{skill.name}</h3>
-                <span className="text-sm font-bold" style={{ ...displayFont, color: skillCategories[activeCategory].color }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <h3 className="font-medium text-white" style={{ ...displayFont, fontSize: 14 }}>{skill.name}</h3>
+                <span className="font-bold" style={{ ...displayFont, fontSize: 13, color: skillCategories[activeCategory].color }}>
                   {skill.level}%
                 </span>
               </div>
-              <div style={{ height: 6, borderRadius: 999, overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
+              <div style={{ height: 5, borderRadius: 999, overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
                 <motion.div
                   className="h-full rounded-full"
                   style={{ background: `linear-gradient(90deg, ${skillCategories[activeCategory].color}, ${skillCategories[activeCategory].color}80)` }}
@@ -142,7 +147,8 @@ export default function Skills() {
         </motion.div>
 
         <motion.div
-          style={{ marginTop: 80, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}
+          className="skills-tags"
+          style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -152,13 +158,13 @@ export default function Skills() {
             (tag, i) => (
               <motion.span
                 key={tag}
-                className="px-4 py-2 text-xs tracking-wider rounded-full glass"
-                style={{ ...displayFont, color: 'rgba(255,255,255,0.3)' }}
+                className="rounded-full glass"
+                style={{ ...displayFont, padding: '6px 14px', fontSize: 11, letterSpacing: '0.05em', color: 'rgba(255,255,255,0.3)' }}
                 whileHover={{ scale: 1.1 }}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.04 }}
               >
                 {tag}
               </motion.span>
