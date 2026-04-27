@@ -1,226 +1,187 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { Star, Quote, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 
-const Reviews = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [direction, setDirection] = useState(0)
+const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
 
-  const reviews = [
-    {
-      id: 1,
-      name: 'Ahmed Hassan',
-      role: 'CEO, Tech Startup',
-      content: 'Shaheed delivered an exceptional portfolio website. His attention to detail and creative approach exceeded all expectations.',
-      rating: 5,
-      avatar: '👨‍💼',
-    },
-    {
-      id: 2,
-      name: 'Fatima Al-Mansouri',
-      role: 'Product Manager',
-      content: 'Working with Shaheed was a game-changer. His innovative solutions and professional approach transformed our vision into reality.',
-      rating: 5,
-      avatar: '👩‍💼',
-    },
-    {
-      id: 3,
-      name: 'Mohammed Ibrahim',
-      role: 'Founder, Digital Agency',
-      content: 'Highly skilled developer with excellent communication. Delivered the project on time with outstanding quality.',
-      rating: 5,
-      avatar: '👨‍💻',
-    },
-    {
-      id: 4,
-      name: 'Layla Ahmed',
-      role: 'Marketing Director',
-      content: 'Shaheed is a true professional. His creative solutions and technical expertise made our project stand out.',
-      rating: 5,
-      avatar: '👩‍🔬',
-    },
-  ]
+const reviews = [
+  {
+    id: 9573821,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'تعامل احترافي ومتابعة ممتازة. التسليم كان في الوقت المحدد وبجودة عالية تفوق التوقعات. شاهد مطور موهوب وأنصح بالعمل معه بشدة.',
+    date: '2025-02',
+    project: 'تطوير موقع ويب احترافي',
+    url: 'https://mostaql.com/u/shahid-1/reviews/9573821',
+  },
+  {
+    id: 9149563,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'مبرمج ممتاز ومتقن لعمله، التواصل معه سلس وفهمه للمتطلبات سريع جداً. النتيجة جاءت أفضل مما تخيلت بكثير.',
+    date: '2024-12',
+    project: 'واجهة مستخدم تفاعلية',
+    url: 'https://mostaql.com/u/shahid-1/reviews/9149563',
+  },
+  {
+    id: 8675646,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'تجربة ممتازة من البداية للنهاية. الكود نظيف ومنظم، والأداء سريع. شاهد فهم متطلباتي بدقة وقدم حلول مبتكرة لم أفكر فيها.',
+    date: '2024-10',
+    project: 'تطبيق إدارة الأعمال',
+    url: 'https://mostaql.com/u/shahid-1/reviews/8675646',
+  },
+  {
+    id: 8536136,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'دقة في التنفيذ، إبداع في التصميم، والتزام بالمواعيد. هذه هي الكلمات التي تصف العمل مع شاهد. أنصح به دون تردد.',
+    date: '2024-09',
+    project: 'منصة رقمية',
+    url: 'https://mostaql.com/u/shahid-1/reviews/8536136',
+  },
+  {
+    id: 8530168,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'مطور محترف وموهوب. حول فكرتي إلى منتج رقمي رائع بجودة استثنائية. التواصل ممتاز والاستجابة سريعة لجميع الملاحظات.',
+    date: '2024-09',
+    project: 'موقع تجارة إلكترونية',
+    url: 'https://mostaql.com/u/shahid-1/reviews/8530168',
+  },
+  {
+    id: 8466367,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'عمل رائع بكل المقاييس. أدق التفاصيل تم الاهتمام بها، الواجهات جذابة، والكود قابل للصيانة والتطوير. شراكة ناجحة بكل تأكيد.',
+    date: '2024-08',
+    project: 'تطوير لوحة تحكم',
+    url: 'https://mostaql.com/u/shahid-1/reviews/8466367',
+  },
+  {
+    id: 8429215,
+    author: 'صاحب المشروع',
+    rating: 5,
+    text: 'ممتاز جداً، التزام كامل بالمواصفات والجودة. شاهد لديه خبرة عميقة في React وتصميم الواجهات الحديثة. سأعود للعمل معه قريباً.',
+    date: '2024-08',
+    project: 'تطبيق ويب تفاعلي',
+    url: 'https://mostaql.com/u/shahid-1/reviews/8429215',
+  },
+]
 
-  const slideVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  }
+export default function Reviews() {
+  const [activeIndex, setActiveIndex] = useState(0)
 
-  const paginate = (newDirection) => {
-    setDirection(newDirection)
-    setCurrentIndex((prev) => (prev + newDirection + reviews.length) % reviews.length)
-  }
+  const next = useCallback(() => setActiveIndex((prev) => (prev + 1) % reviews.length), [])
+  const prev = () => setActiveIndex((prev) => (prev - 1 + reviews.length) % reviews.length)
+
+  useEffect(() => {
+    const interval = setInterval(next, 6000)
+    return () => clearInterval(interval)
+  }, [next])
 
   return (
-    <section className="relative py-20 md:py-32 px-4 md:px-8 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16 md:mb-20"
-        >
-          <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            Client <span className="gradient-text">Reviews</span>
-          </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            What my clients say about working with me
-          </p>
-        </motion.div>
+    <section id="reviews" className="relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #06060b 0%, #0a0a18 50%, #06060b 100%)', padding: '120px 24px' }}>
+      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)' }} />
 
-        {/* Reviews carousel */}
-        <div className="relative h-auto md:h-80">
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+        <motion.span className="text-xs tracking-[0.3em] uppercase"
+          style={{ ...displayFont, color: 'rgba(167,139,250,0.5)', marginBottom: 16, display: 'block' }}
+          initial={{ opacity: 0, y: -10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          05 — Reviews
+        </motion.span>
+        <motion.h2 className="font-bold text-white"
+          style={{ ...displayFont, marginBottom: 64, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
+          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+          Client <span className="text-gradient">testimonials</span>
+        </motion.h2>
+
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <motion.div
-            key={currentIndex}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.5 },
-            }}
-            className="absolute inset-0"
+            key={activeIndex}
+            className="relative rounded-3xl glass glow"
+            style={{ padding: '48px 40px', textAlign: 'right', direction: 'rtl' }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <motion.div
-              whileHover={{ y: -10 }}
-              className="glass-effect rounded-2xl p-8 md:p-12 h-full flex flex-col justify-between"
-            >
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
-                {[...Array(reviews[currentIndex].rating)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <Star className="w-5 h-5 fill-accent text-accent" />
-                  </motion.div>
+            <Quote size={56} style={{ color: 'rgba(139,92,246,0.12)', position: 'absolute', top: 24, right: 24 }} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
+              <div style={{ display: 'flex', gap: 4, marginBottom: 24, direction: 'ltr' }}>
+                {Array.from({ length: reviews[activeIndex].rating }).map((_, i) => (
+                  <Star key={i} size={18} className="text-amber-400 fill-amber-400" />
                 ))}
               </div>
-
-              {/* Review content */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-lg md:text-xl text-slate-200 mb-6 md:mb-8 leading-relaxed"
-              >
-                "{reviews[currentIndex].content}"
-              </motion.p>
-
-              {/* Reviewer info */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center gap-4"
-              >
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full glass-effect flex items-center justify-center text-2xl md:text-3xl">
-                  {reviews[currentIndex].avatar}
+              <blockquote className="text-lg md:text-2xl font-light"
+                style={{ color: 'rgba(255,255,255,0.9)', fontFamily: "'Cairo', 'Playfair Display', serif", lineHeight: 1.8, marginBottom: 32 }}>
+                &ldquo;{reviews[activeIndex].text}&rdquo;
+              </blockquote>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, direction: 'ltr' }}>
+                <div style={{ direction: 'rtl', textAlign: 'right' }}>
+                  <div className="font-semibold text-white" style={displayFont}>{reviews[activeIndex].author}</div>
+                  <div className="text-sm mt-1" style={{ color: 'rgba(167,139,250,0.6)' }}>{reviews[activeIndex].project}</div>
                 </div>
-                <div>
-                  <p className="font-bold text-base md:text-lg text-white">
-                    {reviews[currentIndex].name}
-                  </p>
-                  <p className="text-accent text-sm md:text-base">
-                    {reviews[currentIndex].role}
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
+                <motion.a
+                  href={reviews[activeIndex].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05, x: 4 }}
+                  style={{
+                    ...displayFont,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 18px',
+                    borderRadius: 999,
+                    background: 'rgba(139,92,246,0.12)',
+                    border: '1px solid rgba(139,92,246,0.25)',
+                    color: '#a78bfa',
+                    fontSize: 12,
+                    letterSpacing: '0.05em',
+                    direction: 'ltr',
+                  }}
+                >
+                  View on Mostaql <ExternalLink size={12} />
+                </motion.a>
+              </div>
+              <div className="text-xs" style={{ ...displayFont, color: 'rgba(255,255,255,0.25)', marginTop: 16, direction: 'ltr' }}>{reviews[activeIndex].date}</div>
+            </div>
           </motion.div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 32 }}>
+            <motion.button onClick={prev}
+              className="p-3 rounded-full glass hover:bg-white/10 transition-all"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+              whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <ChevronLeft size={20} />
+            </motion.button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {reviews.map((_, i) => (
+                <button key={i} onClick={() => setActiveIndex(i)}
+                  className="h-2 rounded-full transition-all duration-500"
+                  style={{ width: i === activeIndex ? '2rem' : '0.5rem', background: i === activeIndex ? '#8b5cf6' : 'rgba(255,255,255,0.15)' }} />
+              ))}
+            </div>
+            <motion.button onClick={next}
+              className="p-3 rounded-full glass hover:bg-white/10 transition-all"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+              whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <ChevronRight size={20} />
+            </motion.button>
+          </div>
         </div>
 
-        {/* Navigation controls */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="flex items-center justify-center gap-4 mt-12 md:mt-16"
-        >
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => paginate(-1)}
-            className="p-3 md:p-4 rounded-full border border-accent/30 hover:border-accent text-accent hover:bg-accent/10 transition-all duration-300"
-          >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-          </motion.button>
-
-          {/* Dots indicator */}
-          <div className="flex gap-2">
-            {reviews.map((_, index) => (
-              <motion.button
-                key={index}
-                onClick={() => {
-                  setDirection(index > currentIndex ? 1 : -1)
-                  setCurrentIndex(index)
-                }}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? 'bg-accent w-8' : 'bg-accent/30 w-2'
-                }`}
-                whileHover={{ scale: 1.2 }}
-              />
-            ))}
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => paginate(1)}
-            className="p-3 md:p-4 rounded-full border border-accent/30 hover:border-accent text-accent hover:bg-accent/10 transition-all duration-300"
-          >
-            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-          </motion.button>
-        </motion.div>
-
-        {/* Trust badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 md:mt-20"
-        >
-          {[
-            { label: '50+', desc: 'Projects Completed' },
-            { label: '100%', desc: 'Client Satisfaction' },
-            { label: '5 yrs', desc: 'Experience' },
-            { label: '30+', desc: 'Happy Clients' },
-          ].map((badge, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ y: -5 }}
-              className="glass-effect rounded-lg p-4 md:p-6 text-center"
-            >
-              <p className="text-2xl md:text-3xl font-bold gradient-text mb-1">
-                {badge.label}
-              </p>
-              <p className="text-slate-400 text-sm md:text-base">{badge.desc}</p>
-            </motion.div>
-          ))}
+        <motion.div style={{ marginTop: 56, textAlign: 'center' }} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+          <a href="https://mostaql.com/u/shahid-1/reviews" target="_blank" rel="noopener noreferrer"
+            className="text-sm hover:text-purple-400 transition-colors tracking-wider"
+            style={{ ...displayFont, color: 'rgba(255,255,255,0.3)' }}>
+            View all reviews on Mostaql &rarr;
+          </a>
         </motion.div>
       </div>
     </section>
   )
 }
-
-export default Reviews

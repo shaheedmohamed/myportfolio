@@ -1,180 +1,342 @@
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react'
+import CodeSymbols3D from './CodeSymbols3D'
+import TypingTerminal from './TypingTerminal'
 
-const Hero = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+function ParticleCanvas() {
+  const canvasRef = useRef(null)
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d', { alpha: true })
+    const isMobile = window.innerWidth < 768
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+
+    const resize = () => {
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = window.innerWidth + 'px'
+      canvas.style.height = window.innerHeight + 'px'
+      ctx.scale(dpr, dpr)
     }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    resize()
+    let resizeT
+    const onResize = () => {
+      clearTimeout(resizeT)
+      resizeT = setTimeout(resize, 200)
+    }
+    window.addEventListener('resize', onResize)
+
+    const particleCount = isMobile ? 25 : 50
+    const particles = []
+    const W = window.innerWidth
+    const H = window.innerHeight
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 1.6 + 0.5,
+        color: Math.random() > 0.5 ? '139,92,246' : '6,182,212',
+        alpha: Math.random() * 0.4 + 0.1,
+      })
+    }
+
+    let frame = 0
+    let raf
+    const linkDist = isMobile ? 0 : 110
+
+    function animate() {
+      frame++
+      // On mobile, run at ~30fps. Skip every other frame.
+      if (isMobile && frame % 2 === 0) {
+        raf = requestAnimationFrame(animate)
+        return
+      }
+      ctx.clearRect(0, 0, W, H)
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        if (p.x < 0) p.x = W
+        else if (p.x > W) p.x = 0
+        if (p.y < 0) p.y = H
+        else if (p.y > H) p.y = 0
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(${p.color},${p.alpha})`
+        ctx.fill()
+
+        if (linkDist > 0) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j]
+            const ddx = p.x - p2.x
+            if (ddx > linkDist || ddx < -linkDist) continue
+            const ddy = p.y - p2.y
+            if (ddy > linkDist || ddy < -linkDist) continue
+            const d = Math.sqrt(ddx * ddx + ddy * ddy)
+            if (d < linkDist) {
+              ctx.beginPath()
+              ctx.moveTo(p.x, p.y)
+              ctx.lineTo(p2.x, p2.y)
+              ctx.strokeStyle = `rgba(139,92,246,${0.05 * (1 - d / linkDist)})`
+              ctx.lineWidth = 0.5
+              ctx.stroke()
+            }
+          }
+        }
+      }
+      raf = requestAnimationFrame(animate)
+    }
+    animate()
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+      cancelAnimationFrame(raf)
+    }
   }, [])
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  }
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 z-0"
+      style={{ width: '100%', height: '100%' }}
+    />
+  )
+}
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: 'easeOut' },
+const letterVariants = {
+  hidden: { y: 80, opacity: 0 },
+  visible: (i) => ({
+    y: 0,
+    opacity: 1,
+    transition: {
+      delay: 0.8 + i * 0.05,
+      duration: 0.7,
+      ease: [0.16, 1, 0.3, 1],
     },
-  }
+  }),
+}
 
-  const floatingVariants = {
-    animate: {
-      y: [0, -20, 0],
-      transition: {
-        duration: 4,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      },
-    },
-  }
+export default function Hero() {
+  const firstName = 'Shaheed'
+  const lastName = 'Mohamed'
+  const nameRef = useRef(null)
+
+  useEffect(() => {
+    const el = nameRef.current
+    if (!el) return
+    if (window.innerWidth < 768) return // skip on mobile
+    let pending = false
+    let mx = 0.5, my = 0.5
+    const handle = (e) => {
+      mx = e.clientX / window.innerWidth
+      my = e.clientY / window.innerHeight
+      if (!pending) {
+        pending = true
+        requestAnimationFrame(() => {
+          const x = (mx - 0.5) * 12
+          const y = (my - 0.5) * -8
+          el.style.transform = `perspective(1200px) rotateY(${x}deg) rotateX(${y}deg)`
+          pending = false
+        })
+      }
+    }
+    window.addEventListener('mousemove', handle, { passive: true })
+    return () => window.removeEventListener('mousemove', handle)
+  }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-accent rounded-full mix-blend-screen filter blur-3xl opacity-20"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
+    <section
+      id="hero"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #06060b 0%, #0a0a18 50%, #06060b 100%)' }}
+    >
+      <ParticleCanvas />
+      <CodeSymbols3D />
+
+      {/* Radial glow orbs - static, CSS animated */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        <div
+          style={{
+            position: 'absolute',
+            top: '25%',
+            left: '25%',
+            width: 'min(60vw, 600px)',
+            height: 'min(60vw, 600px)',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+            animation: 'orbDrift 14s ease-in-out infinite',
+            willChange: 'transform',
           }}
-          transition={{ duration: 8, repeat: Infinity }}
         />
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-accent-dark rounded-full mix-blend-screen filter blur-3xl opacity-15"
-          animate={{
-            x: [0, -50, 0],
-            y: [0, -30, 0],
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '20%',
+            right: '20%',
+            width: 'min(50vw, 500px)',
+            height: 'min(50vw, 500px)',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)',
+            animation: 'orbDrift2 18s ease-in-out infinite',
+            willChange: 'transform',
           }}
-          transition={{ duration: 10, repeat: Infinity, delay: 1 }}
         />
       </div>
+      <style>{`
+        @keyframes orbDrift {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(30px, -20px, 0) scale(1.15); }
+        }
+        @keyframes orbDrift2 {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+          50% { transform: translate3d(-20px, 20px, 0) scale(1); }
+        }
+      `}</style>
 
-      {/* Mouse follower effect */}
-      <motion.div
-        className="absolute w-96 h-96 pointer-events-none"
-        animate={{
-          x: mousePosition.x - 192,
-          y: mousePosition.y - 192,
-        }}
-        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-      >
-        <div className="w-full h-full rounded-full bg-gradient-to-r from-accent to-accent-dark opacity-5 blur-3xl" />
-      </motion.div>
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#06060b] to-transparent z-[2]" />
 
-      <motion.div
-        className="relative z-10 text-center px-4 md:px-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Subtitle */}
-        <motion.div variants={itemVariants} className="mb-6">
-          <motion.span
-            className="inline-block px-4 py-2 rounded-full border border-accent/30 text-accent text-sm md:text-base font-medium glass-effect"
-            whileHover={{ scale: 1.05, borderColor: '#00d9ff' }}
-          >
-            Welcome to my digital space
-          </motion.span>
+      {/* Content */}
+      <div className="relative z-10" style={{ textAlign: 'center', padding: '0 40px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+        {/* Pre-title */}
+        <motion.div
+          style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 1 }}
+        >
+          <span className="h-px w-8 bg-gradient-to-r from-transparent to-purple-500/60" />
+          <span className="text-xs tracking-[0.3em] uppercase text-purple-400/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Creative Developer
+          </span>
+          <span className="h-px w-8 bg-gradient-to-l from-transparent to-cyan-500/60" />
         </motion.div>
 
-        {/* Main heading */}
-        <motion.div variants={itemVariants} className="mb-6">
-          <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold mb-4 leading-tight">
-            <span className="block text-white">I'm</span>
-            <motion.span
-              className="block gradient-text text-5xl md:text-8xl lg:text-9xl font-black"
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              Shaheed Mohamed
-            </motion.span>
-          </h1>
-        </motion.div>
+        {/* Name */}
+        <h1 ref={nameRef} className="font-bold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif", lineHeight: 0.95, fontSize: 'clamp(48px, 11vw, 140px)', transformStyle: 'preserve-3d', transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform' }}>
+          <span className="block overflow-hidden">
+            {firstName.split('').map((char, i) => (
+              <motion.span
+                key={`f-${i}`}
+                className="inline-block text-white"
+                variants={letterVariants}
+                initial="hidden"
+                animate="visible"
+                custom={i}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+          <span className="block overflow-hidden" style={{ marginTop: 8 }}>
+            {lastName.split('').map((char, i) => (
+              <motion.span
+                key={`l-${i}`}
+                className="inline-block text-gradient"
+                variants={letterVariants}
+                initial="hidden"
+                animate="visible"
+                custom={i + firstName.length}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+        </h1>
 
-        {/* Slogan */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <p className="text-lg md:text-2xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Crafting <span className="text-accent font-semibold">digital experiences</span> that inspire,
-            <br />
-            <span className="text-accent font-semibold">innovate</span>, and transform ideas into reality
-          </p>
-        </motion.div>
+        {/* Tagline */}
+        <motion.p
+          className="text-base sm:text-lg md:text-xl"
+          style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 560, margin: '32px auto 0', lineHeight: 1.7 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Crafting immersive digital experiences where{' '}
+          <span className="text-purple-400">design meets engineering</span>.
+          Turning bold ideas into pixel-perfect reality.
+        </motion.p>
 
         {/* CTA Buttons */}
         <motion.div
-          variants={itemVariants}
-          className="flex flex-col md:flex-row gap-4 justify-center items-center mb-12"
+          style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 16 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.2, duration: 0.8 }}
         >
-          <motion.button
-            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(0, 217, 255, 0.5)' }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-accent to-accent-dark text-primary font-bold rounded-lg text-base md:text-lg transition-all duration-300 glow-effect"
+          <motion.a
+            href="#projects"
+            className="group relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', fontFamily: "'Space Grotesk', sans-serif", padding: '16px 36px', borderRadius: 999, fontSize: 14, letterSpacing: '0.08em', color: '#fff', minHeight: 52, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+            whileHover={{ scale: 1.04, boxShadow: '0 0 40px rgba(139,92,246,0.45)' }}
+            whileTap={{ scale: 0.96 }}
           >
-            View My Work
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05, borderColor: '#00d9ff' }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 md:px-10 py-3 md:py-4 border-2 border-accent/50 text-accent font-bold rounded-lg text-base md:text-lg hover:border-accent transition-all duration-300"
+            <span style={{ position: 'relative', zIndex: 10 }}>View My Work</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          </motion.a>
+
+          <motion.a
+            href="#contact"
+            className="glass hover:bg-white/10 transition-all duration-300"
+            style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'Space Grotesk', sans-serif", padding: '16px 36px', borderRadius: 999, fontSize: 14, letterSpacing: '0.08em', minHeight: 52, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
           >
             Get In Touch
-          </motion.button>
+          </motion.a>
         </motion.div>
 
-        {/* Floating elements */}
+        {/* Social links */}
         <motion.div
-          variants={floatingVariants}
-          animate="animate"
-          className="flex justify-center gap-8 mb-12"
+          style={{ marginTop: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.6, duration: 0.8 }}
         >
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="w-12 h-12 md:w-16 md:h-16 rounded-lg glass-effect flex items-center justify-center text-accent text-2xl md:text-3xl font-bold"
-          >
-            ⚡
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="w-12 h-12 md:w-16 md:h-16 rounded-lg glass-effect flex items-center justify-center text-accent text-2xl md:text-3xl font-bold"
-          >
-            🎨
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="w-12 h-12 md:w-16 md:h-16 rounded-lg glass-effect flex items-center justify-center text-accent text-2xl md:text-3xl font-bold"
-          >
-            💡
-          </motion.div>
+          {[
+            { icon: Github, href: 'https://github.com/shaheedmohamed' },
+            { icon: Linkedin, href: '#' },
+            { icon: Mail, href: 'mailto:contact@shaheed.dev' },
+          ].map(({ icon: Icon, href }, i) => (
+            <motion.a
+              key={i}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full glass transition-all duration-300"
+              style={{ color: 'rgba(255,255,255,0.4)', padding: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+              whileHover={{ scale: 1.2, y: -3, color: '#a78bfa' }}
+            >
+              <Icon size={18} />
+            </motion.a>
+          ))}
         </motion.div>
+      </div>
 
-        {/* Scroll indicator */}
+      {/* Scroll indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3, duration: 1 }}
+      >
+        <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: 'rgba(255,255,255,0.25)', fontFamily: "'Space Grotesk', sans-serif" }}>
+          Scroll
+        </span>
         <motion.div
-          animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="flex justify-center mt-8 md:mt-12"
         >
-          <ChevronDown className="w-6 h-6 md:w-8 md:h-8 text-accent" />
+          <ArrowDown size={14} style={{ color: 'rgba(255,255,255,0.25)' }} />
         </motion.div>
       </motion.div>
     </section>
   )
 }
-
-export default Hero

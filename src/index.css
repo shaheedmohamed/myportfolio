@@ -1,6 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+
+  --color-primary: #8b5cf6;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #7c3aed;
+  --color-accent: #06b6d4;
+  --color-accent-light: #22d3ee;
+  --color-surface: #06060b;
+  --color-surface-light: #0f0f1a;
+  --color-surface-lighter: #1a1a2e;
+}
 
 * {
   margin: 0;
@@ -14,59 +27,131 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #06060b;
+  color: #c8cdd5;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #8b5cf6;
+  color: white;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #06060b;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #00d9ff;
-  border-radius: 5px;
+  background: #7c3aed;
+  border-radius: 99px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #0099cc;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #06b6d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.glow-effect {
-  box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-effect {
-  background: rgba(30, 41, 59, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 217, 255, 0.2);
+.glass-strong {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.noise-bg {
-  position: relative;
-  overflow: hidden;
+.glow {
+  box-shadow:
+    0 0 30px rgba(139, 92, 246, 0.15),
+    0 0 60px rgba(139, 92, 246, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.noise-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
+.glow-text {
+  text-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.4); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes particle-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  25% { transform: translate(10px, -20px) scale(1.1); opacity: 0.8; }
+  50% { transform: translate(-5px, -40px) scale(0.9); opacity: 0.6; }
+  75% { transform: translate(15px, -20px) scale(1.05); opacity: 0.7; }
+}
+
+/* Form input focus */
+input:focus, textarea:focus {
+  border-color: rgba(139, 92, 246, 0.5) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Reduce expensive heavy filters site-wide */
+.glass {
+  contain: layout style;
+}
+
+/* Disable expensive effects when user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile spacing overrides - sections feel less cramped */
+@media (max-width: 768px) {
+  section {
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  section > div[style*="max-width"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+[data-theme="light"] body {
+  background: #f8f9fc;
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .glass-strong {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
 }

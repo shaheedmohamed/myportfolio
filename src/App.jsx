@@ -1,39 +1,33 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import Navbar from './components/Navbar'
+import Loader from './components/Loader'
+import Navigation from './components/Navigation'
 import Hero from './components/Hero'
+import CodeIntro from './components/CodeIntro'
+import About from './components/About'
+import Skills from './components/Skills'
 import Projects from './components/Projects'
 import Reviews from './components/Reviews'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import ThemeToggle from './components/ThemeToggle'
+import useSectionObserver from './hooks/useSectionObserver'
 
 function App() {
-  const [theme, setTheme] = useState('dark')
-  const [scrollY, setScrollY] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
+  useSectionObserver()
 
   return (
-    <div className={theme === 'dark' ? 'dark' : ''}>
-      <div className="bg-primary text-white min-h-screen">
-        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-        <Navbar scrollY={scrollY} />
+    <>
+      <Loader />
+      <Navigation />
+      <main>
         <Hero />
+        <CodeIntro />
+        <About />
+        <Skills />
         <Projects />
         <Reviews />
         <Contact />
-        <Footer />
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   )
 }
 

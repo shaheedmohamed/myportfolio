@@ -1,236 +1,197 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
-import { Star, GitBranch, ExternalLink } from 'lucide-react'
-import axios from 'axios'
+import { useEffect, useState, useRef } from 'react'
+import { ExternalLink, Github, Star, GitFork, Loader2 } from 'lucide-react'
 
-const Projects = () => {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
+function TiltCard({ children, langColor }) {
+  const ref = useRef(null)
+  const glareRef = useRef(null)
+  const stateRef = useRef({ x: 0.5, y: 0.5, pending: false })
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get('https://api.github.com/users/shaheedmohamed/repos', {
-          params: {
-            sort: 'stars',
-            direction: 'desc',
-            per_page: 6,
-          },
-        })
-        setProjects(response.data)
-        setLoading(false)
-      } catch (error) {
-        console.error('Error fetching projects:', error)
-        setProjects([
-          {
-            id: 1,
-            name: 'Portfolio Website',
-            description: 'Premium portfolio with advanced animations and interactions',
-            url: '#',
-            language: 'React',
-            stars: 24,
-          },
-          {
-            id: 2,
-            name: 'E-Commerce Platform',
-            description: 'Full-stack e-commerce solution with payment integration',
-            url: '#',
-            language: 'Node.js',
-            stars: 18,
-          },
-          {
-            id: 3,
-            name: 'AI Chat Application',
-            description: 'Real-time chat app with AI-powered responses',
-            url: '#',
-            language: 'React',
-            stars: 32,
-          },
-        ])
-        setLoading(false)
-      }
+  const handleMove = (e) => {
+    const card = ref.current
+    if (!card) return
+    const rect = card.getBoundingClientRect()
+    stateRef.current.x = (e.clientX - rect.left) / rect.width
+    stateRef.current.y = (e.clientY - rect.top) / rect.height
+    if (!stateRef.current.pending) {
+      stateRef.current.pending = true
+      requestAnimationFrame(() => {
+        const { x, y } = stateRef.current
+        card.style.transform = `perspective(1000px) rotateX(${(y - 0.5) * -10}deg) rotateY(${(x - 0.5) * 10}deg) translateZ(6px)`
+        if (glareRef.current) {
+          glareRef.current.style.background = `radial-gradient(500px circle at ${x * 100}% ${y * 100}%, ${langColor}22, transparent 40%)`
+          glareRef.current.style.opacity = '1'
+        }
+        stateRef.current.pending = false
+      })
     }
-    fetchProjects()
-  }, [])
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
   }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
+  const handleLeave = () => {
+    const card = ref.current
+    if (!card) return
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)'
+    if (glareRef.current) glareRef.current.style.opacity = '0'
   }
 
   return (
-    <section className="relative py-20 md:py-32 px-4 md:px-8 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16 md:mb-20"
-        >
-          <h2 className="text-4xl md:text-6xl font-bold mb-4">
-            Featured <span className="gradient-text">Projects</span>
-          </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Explore my latest work and innovative solutions
-          </p>
-        </motion.div>
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{
+        position: 'relative',
+        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'transform',
+      }}
+    >
+      {children}
+      <div
+        ref={glareRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: 16,
+          pointerEvents: 'none',
+          opacity: 0,
+          transition: 'opacity 0.3s ease',
+        }}
+      />
+    </div>
+  )
+}
 
-        {/* Filter buttons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-3 mb-12"
-        >
-          {['all', 'React', 'Node.js', 'Full Stack'].map((category) => (
-            <motion.button
-              key={category}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setFilter(category)}
-              className={`px-4 md:px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                filter === category
-                  ? 'bg-gradient-to-r from-accent to-accent-dark text-primary glow-effect'
-                  : 'border border-accent/30 text-accent hover:border-accent'
-              }`}
-            >
-              {category}
-            </motion.button>
-          ))}
-        </motion.div>
+const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
 
-        {/* Projects grid */}
+const fallbackProjects = [
+  { id: 1, name: 'Portfolio Website', description: 'A next-level portfolio with animations and immersive experiences', html_url: 'https://github.com/shaheedmohamed', homepage: '', language: 'JavaScript', stargazers_count: 0, forks_count: 0, topics: ['react', 'framer-motion'] },
+]
+
+const languageColors = {
+  JavaScript: '#f7df1e', TypeScript: '#3178c6', Python: '#3572a5',
+  HTML: '#e34c26', CSS: '#563d7c', Vue: '#41b883', PHP: '#777bb4',
+  Java: '#b07219', Go: '#00add8', Rust: '#dea584', Ruby: '#701516',
+}
+
+export default function Projects() {
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/shaheedmohamed/repos?sort=updated&per_page=12')
+      .then((r) => r.json())
+      .then((data) => setProjects(Array.isArray(data) && data.length > 0 ? data : fallbackProjects))
+      .catch(() => setProjects(fallbackProjects))
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <section id="projects" className="relative overflow-hidden" style={{ background: '#06060b', padding: '120px 24px' }}>
+      <div className="absolute bottom-0 left-1/2 w-[600px] h-[600px] rounded-full -translate-x-1/2 pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)' }} />
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+        <motion.span className="text-xs tracking-[0.3em] uppercase block"
+          style={{ ...displayFont, color: 'rgba(167,139,250,0.5)', marginBottom: 16 }}
+          initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+          04 — Projects
+        </motion.span>
+        <motion.h2 className="font-bold text-white"
+          style={{ ...displayFont, marginBottom: 24, lineHeight: 1.15, fontSize: 'clamp(32px, 5.5vw, 64px)' }}
+          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+          Selected <span className="text-gradient">works</span>
+        </motion.h2>
+        <motion.p className="text-base md:text-lg"
+          style={{ color: 'rgba(255,255,255,0.4)', maxWidth: 600, marginBottom: 64 }}
+          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+          A curated collection of projects showcasing my technical depth and creative problem-solving.
+        </motion.p>
+
         {loading ? (
-          <div className="text-center py-12">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              className="w-12 h-12 border-2 border-accent border-t-transparent rounded-full mx-auto"
-            />
+          <div className="flex items-center justify-center py-20">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+              <Loader2 size={32} style={{ color: '#8b5cf6' }} />
+            </motion.div>
           </div>
         ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          >
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                variants={itemVariants}
-                whileHover={{ y: -10 }}
-                className="group glass-effect rounded-xl overflow-hidden cursor-pointer"
-              >
-                {/* Project card background */}
-                <div className="relative h-40 md:h-48 bg-gradient-to-br from-accent/10 to-accent-dark/10 overflow-hidden">
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-accent to-accent-dark opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                    animate={{ x: [0, 100, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-4xl md:text-5xl opacity-20 group-hover:opacity-40 transition-opacity">
-                    💻
-                  </div>
-                </div>
-
-                {/* Project content */}
-                <div className="p-6 md:p-8">
-                  <h3 className="text-xl md:text-2xl font-bold mb-2 group-hover:text-accent transition-colors">
-                    {project.name}
-                  </h3>
-                  <p className="text-slate-400 text-sm md:text-base mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-
-                  {/* Project meta */}
-                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs md:text-sm px-3 py-1 rounded-full bg-accent/10 text-accent">
-                        {project.language || 'JavaScript'}
-                      </span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24 }}>
+            {projects.slice(0, 9).map((project, i) => {
+              const langColor = languageColors[project.language] || '#8b5cf6'
+              return (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.6 }}
+                >
+                <TiltCard langColor={langColor}>
+                <article className="group relative rounded-2xl glass overflow-hidden" style={{ display: 'block' }}>
+                  <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${langColor}, transparent)` }} />
+                  <div style={{ padding: 28 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                      <h3 className="font-semibold text-white text-lg truncate flex-1 min-w-0 group-hover:text-purple-400 transition-colors" style={displayFont}>
+                        {project.name}
+                      </h3>
+                      <div className="flex items-center gap-2 ml-3 shrink-0">
+                        <a href={project.html_url} target="_blank" rel="noopener noreferrer"
+                          className="p-2 rounded-lg hover:bg-white/10 transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                          <Github size={16} />
+                        </a>
+                        {project.homepage && (
+                          <a href={project.homepage} target="_blank" rel="noopener noreferrer"
+                            className="p-2 rounded-lg hover:bg-white/10 transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            <ExternalLink size={16} />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    {project.stargazers_count && (
-                      <div className="flex items-center gap-1 text-accent text-sm">
-                        <Star className="w-4 h-4" />
-                        {project.stargazers_count}
+                    <p style={{ fontSize: 14, lineHeight: 1.6, color: 'rgba(255,255,255,0.4)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 20, minHeight: 44 }}>
+                      {project.description || 'No description available'}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {project.language && (
+                        <span className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ background: langColor }} />
+                          {project.language}
+                        </span>
+                      )}
+                      <div className="flex items-center gap-3 text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                        {project.stargazers_count > 0 && (
+                          <span className="flex items-center gap-1"><Star size={12} /> {project.stargazers_count}</span>
+                        )}
+                        {project.forks_count > 0 && (
+                          <span className="flex items-center gap-1"><GitFork size={12} /> {project.forks_count}</span>
+                        )}
+                      </div>
+                    </div>
+                    {project.topics?.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 16 }}>
+                        {project.topics.slice(0, 4).map((topic) => (
+                          <span key={topic} className="px-2 py-0.5 text-[10px] tracking-wider rounded-full"
+                            style={{ ...displayFont, color: 'rgba(167,139,250,0.6)', background: 'rgba(139,92,246,0.1)' }}>
+                            {topic}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
-
-                  {/* Project links */}
-                  <div className="flex gap-3">
-                    <motion.a
-                      href={project.html_url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors text-sm md:text-base"
-                    >
-                      <GitBranch className="w-4 h-4" />
-                      Code
-                    </motion.a>
-                    <motion.a
-                      href={project.html_url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-accent/30 hover:border-accent text-accent rounded-lg transition-colors text-sm md:text-base"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View
-                    </motion.a>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </article>
+                </TiltCard>
+                </motion.div>
+              )
+            })}
+          </div>
         )}
 
-        {/* View all projects button */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center mt-12 md:mt-16"
-        >
-          <motion.a
-            href="https://github.com/shaheedmohamed"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-block px-8 md:px-10 py-3 md:py-4 border-2 border-accent text-accent font-bold rounded-lg hover:bg-accent/10 transition-all duration-300"
-          >
-            View All Projects on GitHub
+        <motion.div style={{ marginTop: 64, textAlign: 'center' }} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+          <motion.a href="https://github.com/shaheedmohamed" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass text-sm tracking-wider hover:bg-white/10 transition-all"
+            style={{ ...displayFont, color: 'rgba(255,255,255,0.55)' }}
+            whileHover={{ scale: 1.05 }}>
+            <Github size={16} /> View All on GitHub
           </motion.a>
         </motion.div>
       </div>
     </section>
   )
 }
-
-export default Projects
