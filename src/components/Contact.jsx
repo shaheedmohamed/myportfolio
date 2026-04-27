@@ -179,9 +179,12 @@ export default function Contact() {
           >
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Name</label>
+                <label htmlFor="contact-name" style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Name</label>
                 <input
+                  id="contact-name"
+                  name="name"
                   type="text"
+                  autoComplete="name"
                   value={formState.name}
                   onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                   style={{ ...inputStyle, padding: '14px 16px', fontSize: 14 }}
@@ -190,9 +193,13 @@ export default function Contact() {
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Email</label>
+                <label htmlFor="contact-email" style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Email</label>
                 <input
+                  id="contact-email"
+                  name="email"
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   value={formState.email}
                   onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                   style={{ ...inputStyle, padding: '14px 16px', fontSize: 14 }}
@@ -202,8 +209,10 @@ export default function Contact() {
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <label style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Message</label>
+              <label htmlFor="contact-message" style={{ ...displayFont, color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Message</label>
               <textarea
+                id="contact-message"
+                name="message"
                 value={formState.message}
                 onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                 rows={6}
