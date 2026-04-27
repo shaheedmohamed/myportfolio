@@ -1,7 +1,33 @@
-import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { motion, useInView, animate } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
 const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
+
+/**
+ * Animated counter that ramps from 0 to `value` once it enters the viewport.
+ * Uses requestAnimationFrame via framer-motion's animate().
+ */
+function AnimatedCounter({ value, color }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, amount: 0.4 })
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    const controls = animate(0, value, {
+      duration: 1.4,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [inView, value])
+
+  return (
+    <span ref={ref} className="font-bold" style={{ ...displayFont, fontSize: 13, color }}>
+      {display}%
+    </span>
+  )
+}
 
 const skillCategories = [
   {
@@ -128,9 +154,11 @@ export default function Skills() {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <h3 className="font-medium text-white" style={{ ...displayFont, fontSize: 14 }}>{skill.name}</h3>
-                <span className="font-bold" style={{ ...displayFont, fontSize: 13, color: skillCategories[activeCategory].color }}>
-                  {skill.level}%
-                </span>
+                <AnimatedCounter
+                  key={`${activeCategory}-${skill.name}`}
+                  value={skill.level}
+                  color={skillCategories[activeCategory].color}
+                />
               </div>
               <div style={{ height: 5, borderRadius: 999, overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
                 <motion.div

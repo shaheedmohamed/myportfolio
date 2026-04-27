@@ -119,6 +119,10 @@ input::placeholder, textarea::placeholder {
   contain: layout style;
 }
 
+/* Hide scrollbar but keep scrolling — used by horizontal filter chips */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* Disable expensive effects when user prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

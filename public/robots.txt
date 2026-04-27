@@ -1,0 +1,7 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /404
+
+# Sitemap
+Sitemap: https://shaheedmohamed.dev/sitemap.xml

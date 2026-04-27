@@ -118,11 +118,17 @@ export default function Projects() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Build dynamic filter list from project languages
+  // Build dynamic filter list with counts, sorted by frequency
   const filters = useMemo(() => {
-    const langs = new Set()
-    projects.forEach((p) => p.language && langs.add(p.language))
-    return ['All', ...Array.from(langs).slice(0, 6)]
+    const counts = new Map()
+    projects.forEach((p) => {
+      if (p.language) counts.set(p.language, (counts.get(p.language) || 0) + 1)
+    })
+    const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6)
+    return [
+      { name: 'All', count: projects.length },
+      ...sorted.map(([name, count]) => ({ name, count })),
+    ]
   }, [projects])
 
   const visibleProjects = useMemo(() => {
@@ -178,28 +184,38 @@ export default function Projects() {
         {/* GitHub Stats Live Widget */}
         <GitHubStats />
 
-        {/* Filter chips */}
+        {/* Filter chips — horizontally scrollable on mobile */}
         {filters.length > 1 && (
           <motion.div
-            style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}
+            className="projects-filter no-scrollbar"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 8,
+              marginBottom: 28,
+              overflowX: 'auto',
+              paddingBottom: 4,
+            }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            {filters.map((filter) => {
+            {filters.map(({ name: filter, count }) => {
               const color = filter === 'All' ? '#8b5cf6' : languageColors[filter] || '#8b5cf6'
               const isActive = activeFilter === filter
               return (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className="text-xs tracking-wider transition-all duration-300"
+                  className="text-xs tracking-wider transition-all duration-300 inline-flex items-center gap-2"
                   style={{
                     ...displayFont,
-                    padding: '8px 18px',
+                    padding: '8px 16px',
                     borderRadius: 999,
                     cursor: 'pointer',
                     border: '1px solid',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                     ...(isActive
                       ? {
                           background: `linear-gradient(135deg, ${color}30, ${color}10)`,
@@ -214,7 +230,19 @@ export default function Projects() {
                         }),
                   }}
                 >
-                  {filter}
+                  <span>{filter}</span>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      padding: '1px 7px',
+                      borderRadius: 999,
+                      background: isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
+                      color: isActive ? '#fff' : 'rgba(255,255,255,0.45)',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {count}
+                  </span>
                 </button>
               )
             })}

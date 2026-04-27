@@ -1,43 +1,28 @@
-import Loader from './components/Loader'
-import Navigation from './components/Navigation'
-import Hero from './components/Hero'
-import CodeIntro from './components/CodeIntro'
-import About from './components/About'
-import Services from './components/Services'
-import Skills from './components/Skills'
-import Experience from './components/Experience'
-import Projects from './components/Projects'
-import Achievements from './components/Achievements'
-import Blog from './components/Blog'
-import Reviews from './components/Reviews'
-import Contact from './components/Contact'
-import Footer from './components/Footer'
-import NowPlaying from './components/NowPlaying'
-import useSectionObserver from './hooks/useSectionObserver'
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
+import Home from './pages/Home'
+import SectionSkeleton from './components/SectionSkeleton'
+
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
-  useSectionObserver()
-
   return (
-    <>
-      <Loader />
-      <Navigation />
-      <main>
-        <Hero />
-        <CodeIntro />
-        <About />
-        <Services />
-        <Skills />
-        <Experience />
-        <Projects />
-        <Achievements />
-        <Blog />
-        <Reviews />
-        <Contact />
-      </main>
-      <Footer />
-      <NowPlaying />
-    </>
+    <HelmetProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<SectionSkeleton minHeight="100vh" />}>
+                <NotFound />
+              </Suspense>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </HelmetProvider>
   )
 }
 

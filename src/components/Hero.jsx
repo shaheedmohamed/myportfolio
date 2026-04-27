@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ArrowDown, Github, Linkedin } from 'lucide-react'
 import CodeSymbols3D from './CodeSymbols3D'
 import TypingTerminal from './TypingTerminal'
+import CVDownload from './CVDownload'
 import { buildWhatsAppUrl, WhatsAppIcon } from '../lib/whatsapp'
 
 function ParticleCanvas() {
@@ -296,6 +297,8 @@ export default function Hero() {
           >
             <WhatsAppIcon size={16} /> Get In Touch
           </motion.a>
+
+          <CVDownload variant="ghost" label="DOWNLOAD CV" />
         </motion.div>
 
         {/* Social links */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Sun, Moon } from 'lucide-react'
+import { Menu, X, Sun, Moon, Download } from 'lucide-react'
 import useStore from '../store/useStore'
 
 const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
@@ -84,6 +84,29 @@ export default function Navigation() {
                 </button>
               ))}
             </div>
+
+            <motion.a
+              href="/ShaheedCV.pdf"
+              download="Shaheed-Mohamed-CV.pdf"
+              target="_blank"
+              rel="noopener"
+              aria-label="Download CV"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full transition-all"
+              style={{
+                ...displayFont,
+                padding: '7px 14px',
+                fontSize: 11,
+                letterSpacing: '0.08em',
+                color: '#a78bfa',
+                background: 'rgba(139,92,246,0.12)',
+                border: '1px solid rgba(167,139,250,0.3)',
+                textDecoration: 'none',
+              }}
+              whileHover={{ scale: 1.05, background: 'rgba(139,92,246,0.2)' }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Download size={12} /> CV
+            </motion.a>
 
             <motion.button onClick={toggleTheme} className="rounded-full glass hover:bg-white/10 transition-colors"
               style={{ padding: 10, color: 'rgba(255,255,255,0.5)' }} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>

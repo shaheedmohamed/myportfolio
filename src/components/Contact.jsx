@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { MapPin, Clock, ArrowUpRight } from 'lucide-react'
 import { WHATSAPP_DISPLAY, buildWhatsAppUrl, WhatsAppIcon } from '../lib/whatsapp'
+import CVDownload from './CVDownload'
 
 const displayFont = { fontFamily: "'Space Grotesk', sans-serif" }
 const inputStyle = {
@@ -135,6 +136,9 @@ export default function Contact() {
               )
             })}
             <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ marginBottom: 4 }}>
+                <CVDownload variant="ghost" label="DOWNLOAD MY CV" />
+              </div>
               {[
                 { label: 'GitHub', href: 'https://github.com/shaheedmohamed', sub: '@shaheedmohamed' },
                 { label: 'Mostaql', href: 'https://mostaql.com/u/shahid-1', sub: '@shahid-1' },
